@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+<title>Costa Brava Rentals | Alquileres Vacacionales</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    min-height: 100vh;
+  }
+
+  /* === FONDO REAL SIN FILTRO BLANCO === */
+  .bg-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-image: url('images/fondos/fondo1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* HERO - FONDO TRANSPARENTE */
+  .hero {
+    text-align: center;
+    padding: 50px 20px 40px;
+    background: transparent;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #E67E22, #F97316);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
+  }
+
+  .hero p {
+    color: white;
+    font-size: 1rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    font-weight: 500;
+  }
+
+  /* Search */
+  .search {
+    display: flex;
+    max-width: 550px;
+    margin: 25px auto 0;
+    background: white;
+    border-radius: 60px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+  }
+
+  .search input {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+  }
+
+  .search button {
+    background: #F97316;
+    border: none;
+    padding: 0 28px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .search button:hover {
+    background: #E65C1E;
+  }
+
+  /* Main */
+  .main {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 0 25px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 35px;
+  }
+
+  /* Grid propiedades */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 25px;
+  }
+
+  /* Tarjeta - fondo blanco semitransparente para ver el fondo */
+  .card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(2px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    border: 1px solid rgba(249,115,22,0.2);
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(249,115,22,0.2);
+    border-color: #F97316;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  /* Carrusel */
+  .carousel {
+    position: relative;
+    height: 220px;
+    background: #f8f2ea;
+    overflow: hidden;
+  }
+
+  .carousel-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .carousel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .carousel-img.active {
+    display: block;
+    animation: fadeScale 0.25s ease;
+  }
+
+  @keyframes fadeScale {
+    from { opacity: 0.7; transform: scale(1.02); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(249,115,22,0.85);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    z-index: 5;
+    transition: 0.2s;
+  }
+
+  .carousel-btn:hover {
+    background: #F97316;
+  }
+
+  .carousel-prev { left: 10px; }
+  .carousel-next { right: 10px; }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    z-index: 5;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: #F97316;
+    width: 18px;
+    border-radius: 9px;
+  }
+
+  /* Info tarjeta */
+  .info {
+    padding: 16px;
+  }
+
+  .info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #C2410C;
+  }
+
+  .location {
+    font-size: 0.7rem;
+    color: #F97316;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .price {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #E65C1E;
+    margin: 8px 0;
+  }
+
+  .details {
+    font-size: 0.7rem;
+    color: #666;
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(2px);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid rgba(249,115,22,0.2);
+    position: sticky;
+    top: 20px;
+  }
+
+  .sidebar h3 {
+    font-size: 1.3rem;
+    color: #C2410C;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Idioma */
+  .langs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+  }
+
+  .lang-btn {
+    background: rgba(249,115,22,0.15);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .lang-btn.active {
+    background: #F97316;
+    color: white;
+  }
+
+  /* Calendario */
+  .selected-dates {
+    background: rgba(249,115,22,0.1);
+    padding: 10px;
+    border-radius: 40px;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #C2410C;
+  }
+
+  .flatpickr-calendar.inline {
+    width: 100% !important;
+    background: white !important;
+    border-radius: 16px !important;
+    border: 1px solid #F97316 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  }
+
+  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
+    background: #F97316 !important;
+    border-color: #F97316 !important;
+  }
+
+  .flatpickr-day.disabled {
+    background: #fde6d5 !important;
+    text-decoration: line-through;
+  }
+
+  .status {
+    background: rgba(249,115,22,0.1);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 15px 0;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #C2410C;
+  }
+
+  .btn-all {
+    width: 100%;
+    padding: 12px;
+    background: #F97316;
+    border: none;
+    border-radius: 40px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.2s;
+  }
+
+  .btn-all:hover {
+    background: #E65C1E;
+  }
+
+  footer {
+    text-align: center;
+    padding: 25px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    font-size: 0.7rem;
+    color: white;
+    margin-top: 40px;
+  }
+
+  /* === MODAL FICHA DE PROPIEDAD === */
+  .property-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    padding: 30px;
+  }
+
+  .property-modal.active {
+    display: flex;
+  }
+
+  .modal-card {
+    background: white;
+    border-radius: 28px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalFade 0.3s ease;
+  }
+
+  @keyframes modalFade {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 32px;
+    color: #F97316;
+    cursor: pointer;
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+
+  .modal-close:hover {
+    background: #F97316;
+    color: white;
+  }
+
+  .modal-gallery {
+    position: relative;
+    height: 350px;
+    background: #f0e8df;
+  }
+
+  .modal-carousel-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .modal-img.active {
+    display: block;
+  }
+
+  .modal-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(249,115,22,0.85);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    z-index: 10;
+  }
+
+  .modal-prev { left: 15px; }
+  .modal-next { right: 15px; }
+
+  .modal-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .modal-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .modal-dot.active {
+    background: #F97316;
+    width: 24px;
+    border-radius: 12px;
+  }
+
+  .modal-info {
+    padding: 25px;
+  }
+
+  .modal-info h2 {
+    font-size: 1.8rem;
+    color: #C2410C;
+    margin-bottom: 8px;
+  }
+
+  .modal-location {
+    color: #F97316;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .modal-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #E65C1E;
+    margin: 15px 0;
+  }
+
+  .modal-details {
+    display: flex;
+    gap: 25px;
+    margin: 15px 0;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+
+  .modal-details span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .modal-description {
+    margin-top: 15px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .modal-book-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(95deg, #F97316, #E65C1E);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  /* Modal de zoom de imagen */
+  .image-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 1100;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-modal.active {
+    display: flex;
+  }
+
+  .image-modal img {
+    max-width: 85vw;
+    max-height: 85vh;
+    border-radius: 16px;
+    border: 3px solid #F97316;
+  }
+
+  .image-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: #F97316;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+    .hero h1 {
+      font-size: 2rem;
+    }
+    .modal-gallery {
+      height: 250px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- FONDO REAL SIN FILTRO -->
+<div class="bg-fixed"></div>
+
+<div class="hero">
+  <h1><i class="fas fa-umbrella-beach"></i> Costa Brava Rentals</h1>
+  <p>🌊 Mar · Sol · Vacaciones inolvidables</p>
+  <div class="search">
+    <input id="locationInput" placeholder="📍 Destino">
+    <input id="dateDisplay" placeholder="📅 Fechas" readonly>
+    <button id="searchBtn">Buscar</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="grid" id="grid"></div>
+
+  <div class="sidebar">
+    <div class="langs">
+      <button class="lang-btn active" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="fr">FR</button>
+      <button class="lang-btn" data-lang="ca">CA</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <h3><i class="fas fa-calendar-alt"></i> Calendario</h3>
+    <div class="selected-dates" id="selectedDates">📅 Ninguna fecha</div>
+    <div id="calendar"></div>
+    <div class="status" id="status">✨ Selecciona fechas</div>
+    <button class="btn-all" id="viewAllBtn">Ver todas las propiedades</button>
+  </div>
+</div>
+
+<footer>
+  <span id="footerText">✨ Costa Brava · Alquileres vacacionales ✨</span>
+</footer>
+
+<!-- MODAL FICHA PROPIEDAD -->
+<div id="propertyModal" class="property-modal">
+  <div class="modal-card">
+    <span class="modal-close" id="modalCloseBtn">&times;</span>
+    <div class="modal-gallery">
+      <div class="modal-carousel-inner" id="modalCarouselInner"></div>
+      <button class="modal-carousel-btn modal-prev" id="modalPrev"><i class="fas fa-chevron-left"></i></button>
+      <button class="modal-carousel-btn modal-next" id="modalNext"><i class="fas fa-chevron-right"></i></button>
+      <div class="modal-dots" id="modalDots"></div>
+    </div>
+    <div class="modal-info">
+      <h2 id="modalTitle"></h2>
+      <div class="modal-location" id="modalLocation"><i class="fas fa-map-marker-alt"></i> </div>
+      <div class="modal-price" id="modalPrice"></div>
+      <div class="modal-details" id="modalDetails"></div>
+      <div class="modal-description" id="modalDescription"></div>
+      <button class="modal-book-btn" id="modalBookBtn">📅 Consultar disponibilidad</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ZOOM IMAGEN -->
+<div id="imageZoomModal" class="image-modal">
+  <span class="image-close">&times;</span>
+  <img id="zoomImage">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  // ===================== TEXTOS =====================
+  const texts = {
+    es: {
+      statusDefault: "✨ Selecciona fechas",
+      statusReserved: "⛔ Fechas reservadas",
+      statusFree: "✅ Fechas disponibles",
+      viewAll: "Ver todas las propiedades",
+      footer: "✨ Costa Brava · Alquileres vacacionales ✨",
+      noDates: "📅 Ninguna fecha",
+      bookBtn: "📅 Consultar disponibilidad",
+      description: "Propiedad vacacional de lujo en la Costa Brava. Disfruta de unas vacaciones inolvidables frente al mar Mediterráneo. Equipada con todas las comodidades y acabados de primera calidad.",
+      prop1: { name: "Villa del Mar", loc: "Lloret de Mar, Cataluña", beds: "3 camas", baths: "3 baños", sqft: "232 m²", price: "200€ / noche" },
+      prop2: { name: "Apartamento Brisa", loc: "Tossa de Mar, Cataluña", beds: "2 camas", baths: "1 baño", sqft: "84 m²", price: "150€ / noche" },
+      prop3: { name: "Chalet Naranja", loc: "Sant Feliu de Guíxols, Cataluña", beds: "4 camas", baths: "2 baños", sqft: "180 m²", price: "280€ / noche" }
+    },
+    fr: {
+      statusDefault: "✨ Choisissez dates",
+      statusReserved: "⛔ Dates réservées",
+      statusFree: "✅ Dates disponibles",
+      viewAll: "Voir toutes",
+      footer: "✨ Costa Brava · Locations ✨",
+      noDates: "📅 Aucune date",
+      bookBtn: "📅 Vérifier disponibilité",
+      description: "Propriété de vacances de luxe sur la Costa Brava. Profitez de vacances inoubliables en bord de mer Méditerranée.",
+      prop1: { name: "Villa Mer", loc: "Lloret de Mar, Catalogne", beds: "3 lits", baths: "3 sdb", sqft: "232 m²", price: "200€ / nuit" },
+      prop2: { name: "Appartement", loc: "Tossa de Mar, Catalogne", beds: "2 lits", baths: "1 sdb", sqft: "84 m²", price: "150€ / nuit" },
+      prop3: { name: "Chalet", loc: "Sant Feliu, Catalogne", beds: "4 lits", baths: "2 sdb", sqft: "180 m²", price: "280€ / nuit" }
+    },
+    ca: {
+      statusDefault: "✨ Tria dates",
+      statusReserved: "⛔ Dates reservades",
+      statusFree: "✅ Dates disponibles",
+      viewAll: "Veure totes",
+      footer: "✨ Costa Brava · Lloguers ✨",
+      noDates: "📅 Cap data",
+      bookBtn: "📅 Consultar disponibilitat",
+      description: "Propietat de luxe a la Costa Brava. Gaudeix d'unes vacances inoblidables davant del mar Mediterrani.",
+      prop1: { name: "Vila Mar", loc: "Lloret de Mar, Catalunya", beds: "3 llits", baths: "3 banys", sqft: "232 m²", price: "200€ / nit" },
+      prop2: { name: "Apartament", loc: "Tossa de Mar, Catalunya", beds: "2 llits", baths: "1 bany", sqft: "84 m²", price: "150€ / nit" },
+      prop3: { name: "Xalet", loc: "Sant Feliu, Catalunya", beds: "4 llits", baths: "2 banys", sqft: "180 m²", price: "280€ / nit" }
+    },
+    en: {
+      statusDefault: "✨ Pick dates",
+      statusReserved: "⛔ Dates booked",
+      statusFree: "✅ Dates available",
+      viewAll: "View all",
+      footer: "✨ Costa Brava · Rentals ✨",
+      noDates: "📅 No dates",
+      bookBtn: "📅 Check availability",
+      description: "Luxury vacation property on the Costa Brava. Enjoy unforgettable holidays by the Mediterranean Sea.",
+      prop1: { name: "Seaside Villa", loc: "Lloret de Mar, Catalonia", beds: "3 beds", baths: "3 baths", sqft: "2500 sq ft", price: "$200 / night" },
+      prop2: { name: "Breeze Apt", loc: "Tossa de Mar, Catalonia", beds: "2 beds", baths: "1 bath", sqft: "900 sq ft", price: "$150 / night" },
+      prop3: { name: "Orange Chalet", loc: "Sant Feliu, Catalonia", beds: "4 beds", baths: "2 baths", sqft: "1940 sq ft", price: "$280 / night" }
+    }
+  };
+
+  let currentLang = 'es';
+  let selectedStart = null, selectedEnd = null;
+
+  const properties = [
+    { id: 0, folder: 'prop1' },
+    { id: 1, folder: 'prop2' },
+    { id: 2, folder: 'prop3' }
+  ];
+
+  const reservations = [
+    { propertyId: 0, start: "2026-06-15", end: "2026-06-22" },
+    { propertyId: 0, start: "2026-07-10", end: "2026-07-18" },
+    { propertyId: 0, start: "2026-08-05", end: "2026-08-12" },
+    { propertyId: 1, start: "2026-06-20", end: "2026-06-27" },
+    { propertyId: 1, start: "2026-07-18", end: "2026-07-25" },
+    { propertyId: 1, start: "2026-08-15", end: "2026-08-22" },
+    { propertyId: 2, start: "2026-06-01", end: "2026-06-08" },
+    { propertyId: 2, start: "2026-07-01", end: "2026-07-07" },
+    { propertyId: 2, start: "2026-08-20", end: "2026-08-28" }
+  ];
+
+  function getAllDisabledDates() {
+    let all = [];
+    reservations.forEach(r => {
+      let cur = new Date(r.start);
+      let end = new Date(r.end);
+      while (cur <= end) {
+        all.push(new Date(cur));
+        cur.setDate(cur.getDate() + 1);
+      }
+    });
+    return all.filter((d, i, arr) => arr.findIndex(x => x.getTime() === d.getTime()) === i);
+  }
+
+  function isRangeAvailable(startStr, endStr) {
+    if (!startStr || !endStr) return null;
+    let start = new Date(startStr);
+    let end = new Date(endStr);
+    for (let r of reservations) {
+      let rs = new Date(r.start);
+      let re = new Date(r.end);
+      if (start <= re && end >= rs) return false;
+    }
+    return true;
+  }
+
+  function generateCarousel(folder) {
+    let slides = '';
+    for (let i = 1; i <= 15; i++) {
+      slides += `<img class="carousel-img" src="images/${folder}/image${i}.jpg" onerror="this.src='https://placehold.co/600x400?text=📷+${i}&bg=FFF0E5'">`;
+    }
+    let dots = '';
+    for (let i = 0; i < 15; i++) dots += `<span class="dot"></span>`;
+    return `
+      <div class="carousel">
+        <div class="carousel-inner">
+          ${slides}
+          <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+          <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+          <div class="carousel-dots">${dots}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function initCarousel(card) {
+    const inner = card.querySelector('.carousel-inner');
+    if (!inner) return;
+    const imgs = inner.querySelectorAll('.carousel-img');
+    const dots = inner.querySelectorAll('.dot');
+    const prev = inner.querySelector('.carousel-prev');
+    const next = inner.querySelector('.carousel-next');
+    if (!imgs.length) return;
+    let current = 0;
+    function show(i) {
+      imgs.forEach((img, idx) => img.classList.toggle('active', idx === i));
+      dots.forEach((dot, idx) => dot.classList.toggle('active', idx === i));
+      current = i;
+    }
+    prev.onclick = (e) => { e.stopPropagation(); show((current - 1 + imgs.length) % imgs.length); };
+    next.onclick = (e) => { e.stopPropagation(); show((current + 1) % imgs.length); };
+    dots.forEach((dot, i) => dot.onclick = (e) => { e.stopPropagation(); show(i); });
+    show(0);
+  }
+
+  let modalCurrentIndex = 0;
+  let modalImages = [];
+
+  function openPropertyModal(propId, propData) {
+    const modal = document.getElementById('propertyModal');
+    const t = texts[currentLang];
+    const data = t[`prop${propId+1}`];
+
+    document.getElementById('modalTitle').innerText = data.name;
+    document.getElementById('modalLocation').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${data.loc}`;
+    document.getElementById('modalPrice').innerText = data.price;
+    document.getElementById('modalDetails').innerHTML = `
+      <span><i class="fas fa-bed"></i> ${data.beds}</span>
+      <span><i class="fas fa-bath"></i> ${data.baths}</span>
+      <span><i class="fas fa-ruler-combined"></i> ${data.sqft}</span>
+    `;
+    document.getElementById('modalDescription').innerText = t.description;
+    document.getElementById('modalBookBtn').innerText = t.bookBtn;
+
+    const carouselInner = document.getElementById('modalCarouselInner');
+    const dotsContainer = document.getElementById('modalDots');
+    carouselInner.innerHTML = '';
+    dotsContainer.innerHTML = '';
+    modalImages = [];
+
+    for (let i = 1; i <= 15; i++) {
+      const imgPath = `images/${propData.folder}/image${i}.jpg`;
+      const img = document.createElement('img');
+      img.className = 'modal-img';
+      img.src = imgPath;
+      img.onerror = () => { img.src = 'https://placehold.co/600x400?text=📷+'+i; };
+      img.onclick = (e) => {
+        e.stopPropagation();
+        document.getElementById('zoomImage').src = img.src;
+        document.getElementById('imageZoomModal').classList.add('active');
+      };
+      carouselInner.appendChild(img);
+      modalImages.push(img);
+
+      const dot = document.createElement('span');
+      dot.className = 'modal-dot';
+      dot.onclick = () => showModalSlide(i-1);
+      dotsContainer.appendChild(dot);
+    }
+
+    modalCurrentIndex = 0;
+    showModalSlide(0);
+    modal.classList.add('active');
+  }
+
+  function showModalSlide(index) {
+    if (!modalImages.length) return;
+    modalImages.forEach((img, i) => img.classList.toggle('active', i === index));
+    const dots = document.querySelectorAll('.modal-dot');
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    modalCurrentIndex = index;
+  }
+
+  document.getElementById('modalPrev').onclick = () => {
+    if (modalImages.length) showModalSlide((modalCurrentIndex - 1 + modalImages.length) % modalImages.length);
+  };
+  document.getElementById('modalNext').onclick = () => {
+    if (modalImages.length) showModalSlide((modalCurrentIndex + 1) % modalImages.length);
+  };
+  document.getElementById('modalCloseBtn').onclick = () => document.getElementById('propertyModal').classList.remove('active');
+  document.getElementById('propertyModal').onclick = (e) => {
+    if (e.target === document.getElementById('propertyModal')) document.getElementById('propertyModal').classList.remove('active');
+  };
+  document.getElementById('modalBookBtn').onclick = () => alert(`📞 ${texts[currentLang].bookBtn}\nContacta para más información`);
+
+  document.querySelector('.image-close').onclick = () => document.getElementById('imageZoomModal').classList.remove('active');
+  document.getElementById('imageZoomModal').onclick = (e) => {
+    if (e.target === document.getElementById('imageZoomModal')) document.getElementById('imageZoomModal').classList.remove('active');
+  };
+
+  function renderCards() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    const t = texts[currentLang];
+    properties.forEach((prop, idx) => {
+      const data = t[`prop${idx+1}`];
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        ${generateCarousel(prop.folder)}
+        <div class="info">
+          <h3>${data.name}</h3>
+          <div class="location"><i class="fas fa-map-marker-alt"></i> ${data.loc}</div>
+          <div class="price">${data.price}</div>
+          <div class="details">
+            <span><i class="fas fa-bed"></i> ${data.beds}</span>
+            <span><i class="fas fa-bath"></i> ${data.baths}</span>
+            <span><i class="fas fa-ruler-combined"></i> ${data.sqft}</span>
+          </div>
+        </div>
+      `;
+      card.onclick = () => openPropertyModal(idx, prop);
+      grid.appendChild(card);
+      initCarousel(card);
+    });
+  }
+
+  function updateStatus() {
+    const status = document.getElementById('status');
+    const t = texts[currentLang];
+    if (!selectedStart || !selectedEnd) {
+      status.innerHTML = t.statusDefault;
+      return;
+    }
+    const available = isRangeAvailable(selectedStart, selectedEnd);
+    status.innerHTML = available === false ? t.statusReserved : t.statusFree;
+  }
+
+  let calendar;
+  function initCalendar() {
+    calendar = flatpickr("#calendar", {
+      inline: true,
+      mode: "range",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      maxDate: new Date().fp_incr(365),
+      disable: getAllDisabledDates(),
+      onChange: (dates) => {
+        if (dates.length === 2) {
+          selectedStart = dates[0].toISOString().split('T')[0];
+          selectedEnd = dates[1].toISOString().split('T')[0];
+          document.getElementById('dateDisplay').value = `${selectedStart} → ${selectedEnd}`;
+          document.getElementById('selectedDates').innerHTML = `📅 ${selectedStart} → ${selectedEnd}`;
+        } else {
+          selectedStart = null;
+          selectedEnd = null;
+          document.getElementById('dateDisplay').value = '';
+          document.getElementById('selectedDates').innerHTML = `📅 ${texts[currentLang].noDates}`;
+        }
+        updateStatus();
+      }
+    });
+  }
+
+  function changeLanguage(lang) {
+    currentLang = lang;
+    const t = texts[lang];
+    document.getElementById('footerText').innerHTML = t.footer;
+    document.getElementById('viewAllBtn').innerHTML = t.viewAll;
+    if (!selectedStart || !selectedEnd) document.getElementById('selectedDates').innerHTML = `📅 ${t.noDates}`;
+    renderCards();
+    updateStatus();
+    if (calendar) calendar.set('disable', getAllDisabledDates());
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.onclick = () => changeLanguage(btn.dataset.lang));
+  document.getElementById('viewAllBtn').onclick = () => alert(`✨ ${texts[currentLang].viewAll} ✨`);
+  document.getElementById('searchBtn').onclick = () => alert(`🔍 Buscar: ${document.getElementById('locationInput').value || "Costa Brava"}\n📅 ${document.getElementById('dateDisplay').value || "fechas flexibles"}`);
+
+  renderCards();
+  initCalendar();
+  changeLanguage('es');
+</script>
+</body>
+</html>
